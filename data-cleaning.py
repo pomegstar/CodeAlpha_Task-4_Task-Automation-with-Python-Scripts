@@ -1,14 +1,23 @@
+# Handle missing values: Drop rows with missing data
+# Remove duplicates: Automatically removes duplicate rows.
+# Standardize columns: Makes column names uniform (lowercase, no spaces).
+
 import pandas as pd
 
 # Load the CSV file
 def load_data(file_path):
     try:
-        df = pd.read_csv(file_path)
+        # Attempt to read the CSV file using the 'latin1' encoding
+        df = pd.read_csv(file_path, encoding='latin1', engine='python')
         print(f"Data loaded successfully! Shape: {df.shape}")
         return df
     except FileNotFoundError:
         print("File not found. Please check the path.")
         return None
+    except UnicodeDecodeError:
+        print("There was an encoding error. Please check the file encoding.")
+        return None
+
 
 # Handle missing values
 def handle_missing_values(df):
@@ -32,13 +41,6 @@ def standardize_columns(df):
     print("Standardized column names.")
     return df
 
-# Convert data types
-def convert_data_types(df):
-    # Example: Convert 'date' column to datetime type
-    if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
-        print("Converted 'date' column to datetime.")
-    return df
 
 # Save the cleaned dataset
 def save_cleaned_data(df, output_path):
@@ -52,7 +54,6 @@ def automate_data_cleaning(file_path, output_path):
         df = handle_missing_values(df)
         df = remove_duplicates(df)
         df = standardize_columns(df)
-        df = convert_data_types(df)
         save_cleaned_data(df, output_path)
 
 if __name__ == "__main__":
